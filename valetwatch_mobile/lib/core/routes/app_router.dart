@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../features/auth/presentation/auth_provider.dart';
 import '../../features/auth/presentation/home_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../shared/widgets/main_navigation.dart';
 
 class AppRouter {
   static GoRouter router(BuildContext context) {
@@ -34,7 +35,7 @@ class AppRouter {
         ),
         GoRoute(
           path: '/home',
-          builder: (context, state) => const HomeScreen(),
+          builder: (context, state) => const MainNavigation(),
         ),
       ],
     );

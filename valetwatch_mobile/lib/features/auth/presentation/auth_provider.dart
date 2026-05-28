@@ -9,9 +9,26 @@ class AuthProvider extends ChangeNotifier {
   bool isLoading = false;
   bool isAuthenticated = false;
 
+  String? name;
+  String? email;
+
   Future<void> checkAuth() async {
     final token = await TokenStorage.getToken();
+
     isAuthenticated = token != null;
+
+    if (isAuthenticated) {
+      try {
+        final user = await _authService.me();
+
+        name = user['name'];
+        email = user['email'];
+      } catch (_) {
+        await TokenStorage.removeToken();
+        isAuthenticated = false;
+      }
+    }
+
     notifyListeners();
   }
 
@@ -23,10 +40,13 @@ class AuthProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      await _authService.login(
+      final user = await _authService.login(
         email: email,
         password: password,
       );
+
+      name = user['name'];
+      this.email = user['email'];
 
       isAuthenticated = true;
       return true;
@@ -40,7 +60,11 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> logout() async {
     await _authService.logout();
+
+    name = null;
+    email = null;
     isAuthenticated = false;
+
     notifyListeners();
   }
 }

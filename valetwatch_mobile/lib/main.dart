@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:valetwatch_mobile/features/reports/presentation/report_provider.dart';
 
 import 'core/routes/app_router.dart';
 import 'features/auth/presentation/auth_provider.dart';
@@ -15,6 +16,10 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => ParkingZoneProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => ReportProvider(),
+        ),
+        
       ],
       child: const ValetWatchApp(),
     ),

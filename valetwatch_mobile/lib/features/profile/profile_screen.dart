@@ -19,11 +19,31 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             const CircleAvatar(
-              radius: 40,
-              child: Icon(Icons.person, size: 40),
+              radius: 42,
+              child: Icon(Icons.person, size: 42),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+
+            Text(
+              auth.name ?? 'Unknown User',
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              auth.email ?? '-',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+
+            const SizedBox(height: 32),
 
             SizedBox(
               width: double.infinity,

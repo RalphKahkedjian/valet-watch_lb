@@ -20,25 +20,34 @@ class ParkingZoneReportController extends Controller
 
         return response()->json([
             'message' => 'Parking zone reports fetched successfully',
-            'data' => $reports
+            'data' => $reports,
         ]);
     }
 
-    public function store(StoreParkingZoneReportRequest $request)
-    {
-        $report = $this->parkingZoneReportService->createReport([
-            'zone_id' => $request->zone_id,
-            'user_id' => $request->user()->id,
-            'report_type' => $request->report_type,
-            'description' => $request->description,
-            'status' => 'open',
-        ]);
+public function store(StoreParkingZoneReportRequest $request)
+{
+    $imagePath = null;
 
-        return response()->json([
-            'message' => 'Parking zone report created successfully',
-            'data' => $report
-        ], 201);
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('report-images', 'public');
     }
+
+    $report = $this->parkingZoneReportService->createReport([
+        'zone_id' => $request->zone_id,
+        'user_id' => $request->user()->id,
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
+        'image_path' => $imagePath,
+        'report_type' => $request->report_type,
+        'description' => $request->description,
+        'status' => 'open',
+    ]);
+
+    return response()->json([
+        'message' => 'Parking zone report created successfully',
+        'data' => $report,
+    ], 201);
+}
 
     public function show(int $parkingZoneReport)
     {
@@ -46,79 +55,96 @@ class ParkingZoneReportController extends Controller
 
         if (! $report) {
             return response()->json([
-                'message' => 'Parking zone report not found'
+                'message' => 'Parking zone report not found',
             ], 404);
         }
 
         return response()->json([
             'message' => 'Parking zone report fetched successfully',
-            'data' => $report
+            'data' => $report,
         ]);
     }
 
-    public function updateStatus(
-        UpdateParkingZoneReportStatusRequest $request,
-        int $parkingZoneReport
-    ) {
-        $report = $this->parkingZoneReportService->findReport($parkingZoneReport);
+public function updateStatus(
+    UpdateParkingZoneReportStatusRequest $request,
+    int $parkingZoneReport
+) {
+    $report = $this->parkingZoneReportService->findReport($parkingZoneReport);
 
-        if (! $report) {
-            return response()->json([
-                'message' => 'Parking zone report not found'
-            ], 404);
-        }
-
-        $this->parkingZoneReportService->updateReport($report, [
-            'status' => $request->status,
-        ]);
-
+    if (! $report) {
         return response()->json([
-            'message' => 'Report status updated successfully',
-            'data' => $report->fresh()
+            'message' => 'Parking zone report not found',
+        ], 404);
+    }
+
+    $this->parkingZoneReportService->updateReport($report, [
+        'status' => $request->status,
+    ]);
+
+    if (
+        $request->status === 'resolved' &&
+        $report->zone &&
+        in_array($report->report_type, [
+            'fake_valet',
+            'public_spot_claimed',
+        ])
+    ) {
+        $report->zone->update([
+            'status' => 'suspended',
         ]);
     }
+
+    return response()->json([
+        'message' => 'Report status updated successfully',
+        'data' => $report->fresh(),
+    ]);
+}
 
     public function exportCsv(): StreamedResponse
-{
-    $fileName = 'parking-zone-reports.csv';
+    {
+        $fileName = 'parking-zone-reports.csv';
 
-    $headers = [
-        'Content-Type' => 'text/csv',
-        'Content-Disposition' => "attachment; filename=\"$fileName\"",
-    ];
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
 
-    $callback = function () {
-        $file = fopen('php://output', 'w');
+        $callback = function () {
+            $file = fopen('php://output', 'w');
 
-        fputcsv($file, [
-            'ID',
-            'Type',
-            'Status',
-            'Zone',
-            'User',
-            'Email',
-            'Description',
-            'Created At',
-        ]);
-
-        $reports = $this->parkingZoneReportService->getAllReports();
-
-        foreach ($reports as $report) {
             fputcsv($file, [
-                $report->id,
-                $report->report_type,
-                $report->status,
-                $report->zone?->name ?? 'No zone',
-                $report->user?->name ?? 'Unknown',
-                $report->user?->email ?? '-',
-                $report->description ?? '',
-                $report->created_at,
+                'ID',
+                'Type',
+                'Status',
+                'Zone',
+                'User',
+                'Email',
+                'Latitude',
+                'Longitude',
+                'Description',
+                'Created At',
             ]);
-        }
 
-        fclose($file);
-    };
+            $reports = $this->parkingZoneReportService->getAllReports();
 
-    return response()->stream($callback, 200, $headers);
-}
+            foreach ($reports as $report) {
+                fputcsv($file, [
+                    $report->id,
+                    $report->report_type,
+                    $report->status,
+                    $report->zone?->name ?? 'No zone',
+                    $report->user?->name ?? 'Unknown',
+                    $report->user?->email ?? '-',
+                    $report->latitude ?? '-',
+                    $report->longitude ?? '-',
+                    $report->description ?? '',
+                    $report->created_at,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

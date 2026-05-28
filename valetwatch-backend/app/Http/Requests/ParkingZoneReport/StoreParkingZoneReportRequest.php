@@ -15,6 +15,9 @@ class StoreParkingZoneReportRequest extends FormRequest
     {
         return [
             'zone_id' => ['nullable', 'exists:parking_zones,id'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
             'report_type' => [
                 'required',
                 'in:fake_valet,overcharging,public_spot_claimed,unsafe_area,other'

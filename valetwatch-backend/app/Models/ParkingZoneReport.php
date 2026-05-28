@@ -9,6 +9,9 @@ class ParkingZoneReport extends Model
     protected $fillable = [
         'zone_id',
         'user_id',
+        'latitude',
+        'longitude',
+        'image_path',
         'report_type',
         'description',
         'status',

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CarScanController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ParkingSessionController;
 use App\Http\Controllers\Api\ParkingZoneController;
 use App\Http\Controllers\Api\ParkingZoneReportController;
@@ -33,4 +34,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/car-scans', [CarScanController::class, 'store']);
     Route::get('/car-scans/{carScan}', [CarScanController::class, 'show']);
     Route::get('/parking-sessions/{sessionId}/car-scans', [CarScanController::class, 'index']);
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats'])
+    ->middleware('role:admin,government_admin,valet_company');
 });

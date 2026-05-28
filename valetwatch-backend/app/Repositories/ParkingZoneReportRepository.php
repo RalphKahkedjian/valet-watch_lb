@@ -28,4 +28,9 @@ class ParkingZoneReportRepository
             'zone'
         ])->find($reportId);
     }
+
+    public function update(ParkingZoneReport $report, array $data): bool
+    {
+        return $report->update($data);
+    }
 }

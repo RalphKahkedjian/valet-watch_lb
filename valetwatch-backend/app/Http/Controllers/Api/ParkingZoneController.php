@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ParkingZone\StoreParkingZoneRequest;
 use App\Http\Requests\ParkingZone\UpdateParkingZoneRequest;
+use App\Http\Requests\ParkingZone\UpdateParkingZoneStatusRequest;
 use App\Services\ParkingZoneService;
 
 class ParkingZoneController extends Controller
@@ -99,4 +100,26 @@ class ParkingZoneController extends Controller
             'message' => 'Parking zone deleted successfully'
         ]);
     }
+
+    public function updateStatus(
+    UpdateParkingZoneStatusRequest $request,
+    int $parkingZone
+) {
+    $zone = $this->parkingZoneService->findZone($parkingZone);
+
+    if (! $zone) {
+        return response()->json([
+            'message' => 'Parking zone not found'
+        ], 404);
+    }
+
+    $this->parkingZoneService->updateZone($zone, [
+        'status' => $request->status,
+    ]);
+
+    return response()->json([
+        'message' => 'Parking zone status updated successfully',
+        'data' => $zone->fresh()
+    ]);
+}
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CarScanController;
 use App\Http\Controllers\Api\DashboardController;
@@ -35,5 +36,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/car-scans/{carScan}', [CarScanController::class, 'show']);
     Route::get('/parking-sessions/{sessionId}/car-scans', [CarScanController::class, 'index']);
     Route::get('/dashboard/stats', [DashboardController::class, 'stats'])
+    ->middleware('role:admin,government_admin,valet_company');
+    Route::patch('/parking-zones/{parkingZone}/status', [ParkingZoneController::class, 'updateStatus'])
+    ->middleware('role:admin,government_admin');
+    Route::patch('/parking-zone-reports/{parkingZoneReport}/status', [ParkingZoneReportController::class, 'updateStatus'])
+    ->middleware('role:admin,government_admin');
+    Route::get('/analytics/dashboard-charts', [AnalyticsController::class, 'dashboardCharts'])
     ->middleware('role:admin,government_admin,valet_company');
 });

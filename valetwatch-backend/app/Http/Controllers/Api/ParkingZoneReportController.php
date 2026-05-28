@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ParkingZoneReport\StoreParkingZoneReportRequest;
+use App\Http\Requests\ParkingZoneReport\UpdateParkingZoneReportStatusRequest;
 use App\Services\ParkingZoneReportService;
 
 class ParkingZoneReportController extends Controller
@@ -51,6 +52,28 @@ class ParkingZoneReportController extends Controller
         return response()->json([
             'message' => 'Parking zone report fetched successfully',
             'data' => $report
+        ]);
+    }
+
+    public function updateStatus(
+        UpdateParkingZoneReportStatusRequest $request,
+        int $parkingZoneReport
+    ) {
+        $report = $this->parkingZoneReportService->findReport($parkingZoneReport);
+
+        if (! $report) {
+            return response()->json([
+                'message' => 'Parking zone report not found'
+            ], 404);
+        }
+
+        $this->parkingZoneReportService->updateReport($report, [
+            'status' => $request->status,
+        ]);
+
+        return response()->json([
+            'message' => 'Report status updated successfully',
+            'data' => $report->fresh()
         ]);
     }
 }

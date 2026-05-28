@@ -25,4 +25,9 @@ class ParkingZoneReportService
     {
         return $this->parkingZoneReportRepository->find($reportId);
     }
+
+    public function updateReport(ParkingZoneReport $report, array $data): bool
+    {
+        return $this->parkingZoneReportRepository->update($report, $data);
+    }
 }

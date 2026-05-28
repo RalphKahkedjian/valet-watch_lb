@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ParkingZoneReport\StoreParkingZoneReportRequest;
 use App\Http\Requests\ParkingZoneReport\UpdateParkingZoneReportStatusRequest;
 use App\Services\ParkingZoneReportService;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ParkingZoneReportController extends Controller
 {
@@ -76,4 +77,48 @@ class ParkingZoneReportController extends Controller
             'data' => $report->fresh()
         ]);
     }
+
+    public function exportCsv(): StreamedResponse
+{
+    $fileName = 'parking-zone-reports.csv';
+
+    $headers = [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => "attachment; filename=\"$fileName\"",
+    ];
+
+    $callback = function () {
+        $file = fopen('php://output', 'w');
+
+        fputcsv($file, [
+            'ID',
+            'Type',
+            'Status',
+            'Zone',
+            'User',
+            'Email',
+            'Description',
+            'Created At',
+        ]);
+
+        $reports = $this->parkingZoneReportService->getAllReports();
+
+        foreach ($reports as $report) {
+            fputcsv($file, [
+                $report->id,
+                $report->report_type,
+                $report->status,
+                $report->zone?->name ?? 'No zone',
+                $report->user?->name ?? 'Unknown',
+                $report->user?->email ?? '-',
+                $report->description ?? '',
+                $report->created_at,
+            ]);
+        }
+
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+}
 }

@@ -43,4 +43,6 @@ Route::middleware('auth:sanctum')->group(function () {
     ->middleware('role:admin,government_admin');
     Route::get('/analytics/dashboard-charts', [AnalyticsController::class, 'dashboardCharts'])
     ->middleware('role:admin,government_admin,valet_company');
+    Route::get('/parking-zone-reports/export/csv', [ParkingZoneReportController::class, 'exportCsv'])
+    ->middleware('role:admin,government_admin');
 });

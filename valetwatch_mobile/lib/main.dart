@@ -5,6 +5,7 @@ import 'package:valetwatch_mobile/features/reports/presentation/report_provider.
 import 'core/routes/app_router.dart';
 import 'features/auth/presentation/auth_provider.dart';
 import 'features/parking_zones/presentation/parking_zone_provider.dart';
+import 'features/vehicles/presentation/providers/vehicle_provider.dart';
 
 void main() {
   runApp(
@@ -18,6 +19,9 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (_) => ReportProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => VehicleProvider(),
         ),
         
       ],

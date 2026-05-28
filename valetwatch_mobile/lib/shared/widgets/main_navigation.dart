@@ -5,6 +5,7 @@ import '../../features/parking_zones/presentation/parking_zones_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/reports/presentation/report_screen.dart';
 import '../../features/map/presentation/map_screen.dart';
+import '../../features/vehicles/presentation/screens/vehicles_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -22,6 +23,7 @@ class _MainNavigationState
     HomeScreen(),
     ParkingZonesScreen(),
     MapScreen(),
+    VehiclesScreen(),
     ReportScreen(),
     ProfileScreen(),
   ];
@@ -58,6 +60,11 @@ class _MainNavigationState
     icon: Icon(Icons.report_outlined),
     selectedIcon: Icon(Icons.report),
     label: 'Report',
+  ),
+  NavigationDestination(
+    icon: Icon(Icons.directions_car_outlined),
+    selectedIcon: Icon(Icons.directions_car),
+    label: 'Vehicles',
   ),
   NavigationDestination(
     icon: Icon(Icons.person_outline),

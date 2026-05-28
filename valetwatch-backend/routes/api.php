@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ParkingSessionController;
 use App\Http\Controllers\Api\ParkingZoneController;
 use App\Http\Controllers\Api\ParkingZoneReportController;
+use App\Http\Controllers\Api\ValetVerificationController;
 use App\Http\Controllers\Api\VehicleController;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -45,4 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     ->middleware('role:admin,government_admin,valet_company');
     Route::get('/parking-zone-reports/export/csv', [ParkingZoneReportController::class, 'exportCsv'])
     ->middleware('role:admin,government_admin');
+    Route::patch(
+    '/parking-sessions/{parkingSession}/complete',
+    [ParkingSessionController::class, 'complete']
+);
+Route::post('/valet/verify-qr', [ValetVerificationController::class, 'verifyQr']);
 });

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/auth/presentation/home_screen.dart';
-import '../../features/parking_zones/presentation/parking_zones_screen.dart';
+import '../../features/parking_sessions/presentation/start_session_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/reports/presentation/report_screen.dart';
 import '../../features/map/presentation/map_screen.dart';
@@ -21,7 +21,7 @@ class _MainNavigationState
 
   final screens = const [
     HomeScreen(),
-    ParkingZonesScreen(),
+    StartSessionScreen(),
     MapScreen(),
     VehiclesScreen(),
     ReportScreen(),
@@ -49,7 +49,7 @@ class _MainNavigationState
   NavigationDestination(
     icon: Icon(Icons.local_parking_outlined),
     selectedIcon: Icon(Icons.local_parking),
-    label: 'Zones',
+    label: 'Session',
   ),
   NavigationDestination(
     icon: Icon(Icons.map_outlined),

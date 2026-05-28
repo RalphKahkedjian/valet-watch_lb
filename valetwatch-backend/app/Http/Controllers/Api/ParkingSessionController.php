@@ -123,4 +123,29 @@ class ParkingSessionController extends Controller
             'message' => 'Parking session deleted successfully'
         ]);
     }
+
+    public function complete(int $parkingSession)
+{
+    $session = $this->parkingSessionService
+        ->findSession($parkingSession);
+
+    if (! $session) {
+        return response()->json([
+            'message' => 'Parking session not found',
+        ], 404);
+    }
+
+    $this->parkingSessionService->updateSession(
+        $session,
+        [
+            'status' => 'completed',
+            'end_time' => now(),
+        ]
+    );
+
+    return response()->json([
+        'message' => 'Parking session completed successfully',
+        'data' => $session->fresh(),
+    ]);
+}
 }

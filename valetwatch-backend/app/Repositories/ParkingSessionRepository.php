@@ -48,6 +48,15 @@ class ParkingSessionRepository
         return $session->delete();
     }
 
+    public function find(int $sessionId)
+    {
+        return ParkingSession::with([
+            'vehicle',
+            'zone',
+            'customer',
+        ])->find($sessionId);
+    }
+
     public function getActiveSessionForVehicle(int $vehicleId): ?ParkingSession
     {
         return ParkingSession::where('vehicle_id', $vehicleId)

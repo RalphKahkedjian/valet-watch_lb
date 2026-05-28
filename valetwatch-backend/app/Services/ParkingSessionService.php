@@ -42,6 +42,11 @@ class ParkingSessionService
             ->update($session, $data);
     }
 
+    public function findSession(int $sessionId)
+    {
+        return $this->parkingSessionRepository->find($sessionId);
+    }
+
     public function deleteSession(ParkingSession $session): bool
     {
         return $this->parkingSessionRepository

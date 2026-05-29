@@ -6,6 +6,7 @@ class ParkingSessionProvider extends ChangeNotifier {
   final ParkingSessionService _service = ParkingSessionService();
 
   bool isLoading = false;
+  String? lastMessage;
   List<dynamic> sessions = [];
 
   Future<void> fetchSessions() async {
@@ -22,21 +23,24 @@ class ParkingSessionProvider extends ChangeNotifier {
 
   Future<bool> startSession({
     required int vehicleId,
-    int? zoneId,
+    required double latitude,
+    required double longitude,
   }) async {
     try {
       isLoading = true;
+      lastMessage = null;
       notifyListeners();
 
-      await _service.startSession(
+      lastMessage = await _service.startSession(
         vehicleId: vehicleId,
-        zoneId: zoneId,
+        latitude: latitude,
+        longitude: longitude,
       );
 
       await fetchSessions();
-
       return true;
     } catch (_) {
+      lastMessage = null;
       return false;
     } finally {
       isLoading = false;
@@ -45,20 +49,19 @@ class ParkingSessionProvider extends ChangeNotifier {
   }
 
   Future<bool> completeSession(int sessionId) async {
-  try {
-    isLoading = true;
-    notifyListeners();
+    try {
+      isLoading = true;
+      notifyListeners();
 
-    await _service.completeSession(sessionId);
+      await _service.completeSession(sessionId);
 
-    await fetchSessions();
-
-    return true;
-  } catch (_) {
-    return false;
-  } finally {
-    isLoading = false;
-    notifyListeners();
+      await fetchSessions();
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
-}
 }

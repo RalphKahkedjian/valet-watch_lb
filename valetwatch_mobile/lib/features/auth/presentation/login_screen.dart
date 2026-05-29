@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_provider.dart';
+import 'register_screen.dart';
 
 // ─── Brand Colors (same palette) ─────────────────────────────────────────────
 const _kRust    = Color(0xFFAB3C26);
@@ -297,27 +298,25 @@ class _LoginScreenState extends State<LoginScreen>
 
                               const SizedBox(height: 16),
 
-                              // Secondary: register hint
-                              Center(
-                                child: RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      color: _kDark.withOpacity(0.5),
-                                      fontSize: 13,
-                                    ),
-                                    children: [
-                                      const TextSpan(text: "Don't have an account? "),
-                                      TextSpan(
-                                        text: 'Register',
-                                        style: const TextStyle(
-                                          color: _kGreen,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+Center(
+  child: TextButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const RegisterScreen(),
+        ),
+      );
+    },
+    child: const Text(
+      "Don't have an account? Register",
+      style: TextStyle(
+        color: _kGreen,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  ),
+),
                             ],
                           ),
                         ),

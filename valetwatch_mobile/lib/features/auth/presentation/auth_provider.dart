@@ -58,6 +58,36 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> register({
+  required String name,
+  required String email,
+  required String phone,
+  required String password,
+}) async {
+  try {
+    isLoading = true;
+    notifyListeners();
+
+    final user = await _authService.register(
+      name: name,
+      email: email,
+      phone: phone,
+      password: password,
+    );
+
+    this.name = user['name'];
+    this.email = user['email'];
+
+    isAuthenticated = true;
+    return true;
+  } catch (_) {
+    return false;
+  } finally {
+    isLoading = false;
+    notifyListeners();
+  }
+}
+
   Future<void> logout() async {
     await _authService.logout();
 

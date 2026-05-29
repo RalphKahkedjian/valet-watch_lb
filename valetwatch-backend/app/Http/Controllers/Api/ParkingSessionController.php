@@ -8,6 +8,7 @@ use App\Http\Requests\ParkingSession\UpdateParkingSessionRequest;
 use App\Services\ParkingSessionService;
 use Illuminate\Http\Request;
 use Exception;
+use App\Models\ParkingZone;
 
 class ParkingSessionController extends Controller
 {
@@ -28,33 +29,82 @@ class ParkingSessionController extends Controller
     }
 
     // Create parking session
-    public function store(StoreParkingSessionRequest $request)
-    {
-        try {
+   public function store(StoreParkingSessionRequest $request)
+{
+    $latitude = $request->latitude;
+    $longitude = $request->longitude;
 
-            $session = $this->parkingSessionService->createSession([
-                'customer_id' => $request->user()->id,
-                'vehicle_id' => $request->vehicle_id,
-                'attendant_id' => $request->attendant_id,
-                'zone_id' => $request->zone_id,
-                'official_price' => $request->official_price ?? 400000,
-                'start_time' => now(),
-                'status' => 'active',
-            ]);
+    $nearestZone = ParkingZone::query()
+        ->selectRaw("
+            *,
+            (
+                6371000 * acos(
+                    cos(radians(?)) *
+                    cos(radians(latitude)) *
+                    cos(radians(longitude) - radians(?)) +
+                    sin(radians(?)) *
+                    sin(radians(latitude))
+                )
+            ) AS distance
+        ", [
+            $latitude,
+            $longitude,
+            $latitude,
+        ])
+        ->orderBy('distance')
+        ->first();
 
-            return response()->json([
-                'message' => 'Parking session created successfully',
-                'data' => $session
-            ], 201);
-
-        } catch (Exception $e) {
-
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 422);
-
-        }
+    // Suspended/rejected nearby
+    if (
+        $nearestZone &&
+        in_array($nearestZone->status, [
+            'suspended',
+            'rejected',
+        ]) &&
+        $nearestZone->distance <= $nearestZone->radius
+    ) {
+        return response()->json([
+            'message' =>
+                'This valet zone is suspended or unsafe',
+        ], 403);
     }
+
+    $zoneId = null;
+    $status = 'unverified';
+    $officialPrice = null;
+
+    // Approved nearby
+    if (
+        $nearestZone &&
+        $nearestZone->status === 'approved' &&
+        $nearestZone->distance <= $nearestZone->radius
+    ) {
+        $zoneId = $nearestZone->id;
+        $status = 'active';
+        $officialPrice =
+            $nearestZone->official_price;
+    }
+
+    $session =
+        $this->parkingSessionService->createSession([
+            'customer_id' => $request->user()->id,
+            'vehicle_id' => $request->vehicle_id,
+            'zone_id' => $zoneId,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'official_price' => $officialPrice,
+            'status' => $status,
+            'start_time' => now(),
+        ]);
+
+    return response()->json([
+        'message' =>
+            $status === 'active'
+                ? 'Verified parking session started'
+                : 'Unverified parking session started',
+        'data' => $session,
+    ], 201);
+}
 
     // Show single parking session
     public function show(Request $request, int $parkingSession)

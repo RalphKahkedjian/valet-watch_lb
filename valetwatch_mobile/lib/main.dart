@@ -7,6 +7,7 @@ import 'features/auth/presentation/auth_provider.dart';
 import 'features/parking_zones/presentation/parking_zone_provider.dart';
 import 'features/vehicles/presentation/providers/vehicle_provider.dart';
 import 'features/parking_sessions/presentation/parking_session_provider.dart';
+import 'features/car_scans/presentation/car_scan_provider.dart';
 
 void main() {
   runApp(
@@ -26,6 +27,9 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (_) => ParkingSessionProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CarScanProvider(),
         ),
       ],
       child: const ValetWatchApp(),

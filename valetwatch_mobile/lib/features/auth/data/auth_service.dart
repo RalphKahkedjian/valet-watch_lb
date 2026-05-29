@@ -26,6 +26,31 @@ class AuthService {
     return user;
   }
 
+  Future<Map<String, dynamic>> register({
+  required String name,
+  required String email,
+  required String phone,
+  required String password,
+}) async {
+  final response = await _dio.post(
+    '/register',
+    data: {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'password': password,
+      'password_confirmation': password,
+    },
+  );
+
+  final token = response.data['token'];
+  final user = response.data['user'];
+
+  await TokenStorage.saveToken(token);
+
+  return user;
+}
+
   Future<Map<String, dynamic>> me() async {
     final response = await _dio.get('/me');
     return response.data['user'];

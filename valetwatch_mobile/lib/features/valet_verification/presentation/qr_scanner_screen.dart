@@ -73,7 +73,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(22, 28, 22,
-              MediaQuery.of(context).padding.bottom + 120),
+              MediaQuery.of(context).padding.bottom + 270),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
